@@ -1,4 +1,5 @@
 import math
+import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from .GenericDistribution import Distribution
@@ -56,17 +57,16 @@ class Normal(Distribution):
         """
         
         if data is not None:
-            self.mean = self.__calculate_mean__(data)
-            self.stdev = self.__calculate_sigma__(data)
+            mu = self.__calculate_mean__(data)
+            sigma = self.__calculate_sigma__(data)
             self.data = data
             
         else:
             if sigma<0: raise ValueError('sigma value must be non-negative')
 
-            self.mean = mu
-            self.stdev = sigma
-
-            self.sample(size)
+            self.sample(mu,sigma,size)
+        
+        Distribution.__init__(self, mu, sigma)
 
 
     def get_data(self):
@@ -84,7 +84,7 @@ class Normal(Distribution):
         return self.data
 
 
-    def mean(self) -> float:
+    def getmean(self) -> float:
         """Function to get the mean (`sigma`) of the data set.
 
         Parameters
@@ -99,7 +99,7 @@ class Normal(Distribution):
         return self.mean
 
 
-    def stdev(self) -> float:
+    def getstdev(self) -> float:
         """Function to get the standard deviation of the data set.
 
         Parameters
@@ -199,17 +199,20 @@ class Normal(Distribution):
         
         plt.subplots(figsize=figsize, dpi=100)
         plt.title(title)
-        plt.hist(self.data,rwidth=rwidth, color=color,*args,**kwargs)
+        ax = sns.histplot(self.data,kde = True,color=color,*args,**kwargs)
+
+        ax.lines[0].set_color('orange')
+
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.show()
 
 
-    def sample(self,size=None):
+    def sample(self, mean, stdev,size=None):
         """
         TODO
         """
-        self.data = np.random.normal(self.mean,self.stdev,size)
+        self.data = np.random.normal(loc = mean, scale = stdev, size = size)
         return self.data
 
 
